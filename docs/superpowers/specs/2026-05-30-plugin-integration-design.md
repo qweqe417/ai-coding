@@ -78,11 +78,11 @@ ai-coding/
   "description": "AI-powered integration testing framework with middleware validation",
   "version": "1.0.0",
   "author": {
-    "name": "AI Coding Team",
-    "email": "contact@ai-coding.dev"
+    "name": "qweqe417",
+    "email": "qweqe417@users.noreply.github.com"
   },
-  "homepage": "https://github.com/ai-coding-team/ai-coding",
-  "repository": "https://github.com/ai-coding-team/ai-coding",
+  "homepage": "https://github.com/qweqe417/ai-coding",
+  "repository": "https://github.com/qweqe417/ai-coding",
   "license": "MIT",
   "keywords": [
     "testing",
@@ -116,8 +116,8 @@ ai-coding/
   "name": "ai-coding-marketplace",
   "description": "AI Coding integration testing framework marketplace",
   "owner": {
-    "name": "AI Coding Team",
-    "email": "contact@ai-coding.dev"
+    "name": "qweqe417",
+    "email": "qweqe417@users.noreply.github.com"
   },
   "plugins": [
     {
@@ -126,8 +126,8 @@ ai-coding/
       "version": "1.0.0",
       "source": "./",
       "author": {
-        "name": "AI Coding Team",
-        "email": "contact@ai-coding.dev"
+        "name": "qweqe417",
+        "email": "qweqe417@users.noreply.github.com"
       }
     }
   ]
@@ -240,11 +240,11 @@ cp -r /path/to/your/ai-coding ~/.claude/plugins/local/ai-coding
 
 ```bash
 # 在 Claude Code 中
-/install https://github.com/ai-coding-team/ai-coding
+/install https://github.com/qweqe417/ai-coding
 
 # 或手动
 cd ~/.claude/plugins/cache
-git clone https://github.com/ai-coding-team/ai-coding
+git clone https://github.com/qweqe417/ai-coding
 ```
 
 **方式 3：Marketplace（未来）**
@@ -271,7 +271,7 @@ playwright install
 
 ```bash
 # 1. 安装插件（一次性）
-/install https://github.com/ai-coding-team/ai-coding
+/install https://github.com/qweqe417/ai-coding
 
 # 2. 安装依赖（一次性）
 pip install -r ~/.claude/plugins/cache/ai-coding/*/requirements.txt
@@ -504,6 +504,6 @@ fi
 通过添加最少的配置文件（3 个）和修改 SKILL.md（8 个），将 AI Coding 改造为标准的 Claude Code Skills 插件，实现全局安装和跨项目使用，同时保持所有现有 Python 代码不变。
 
 用户体验：
-- 安装：`/install https://github.com/ai-coding-team/ai-coding`
+- 安装：`/install https://github.com/qweqe417/ai-coding`
 - 使用：`/ai-coding:init`
 - 简单、直观、强大
