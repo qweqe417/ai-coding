@@ -19,5 +19,50 @@
     "kafka",
     "elasticsearch",
     "rabbitmq"
-  ]
+  ],
+  "claudePlugin": {
+    "type": "skill",
+    "skills": [
+      {
+        "name": "init",
+        "description": "Initialize AI coding test environment",
+        "path": "skills/init/SKILL.md"
+      },
+      {
+        "name": "integration-test",
+        "description": "Run integration tests with middleware validation",
+        "path": "skills/integration-test/SKILL.md"
+      },
+      {
+        "name": "testcase-generator",
+        "description": "Generate test cases automatically",
+        "path": "skills/testcase-generator/SKILL.md"
+      },
+      {
+        "name": "assertion-generator",
+        "description": "Generate assertions for test cases",
+        "path": "skills/assertion-generator/SKILL.md"
+      },
+      {
+        "name": "diff-analyzer",
+        "description": "Analyze differences in test results",
+        "path": "skills/diff-analyzer/SKILL.md"
+      },
+      {
+        "name": "auto-fixer",
+        "description": "Automatically fix test failures",
+        "path": "skills/auto-fixer/SKILL.md"
+      },
+      {
+        "name": "report-generator",
+        "description": "Generate test reports",
+        "path": "skills/report-generator/SKILL.md"
+      },
+      {
+        "name": "full-test-pipeline",
+        "description": "Run complete test pipeline",
+        "path": "skills/full-test-pipeline/SKILL.md"
+      }
+    ]
+  }
 }
