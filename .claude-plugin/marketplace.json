@@ -8,13 +8,13 @@
   "plugins": [
     {
       "name": "ai-coding",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/qweqe417/ai-coding.git"
+      },
       "description": "AI-powered integration testing framework with middleware validation",
       "version": "1.0.0",
-      "source": "./",
-      "author": {
-        "name": "qweqe417",
-        "email": "qweqe417@users.noreply.github.com"
-      }
+      "strict": true
     }
   ]
 }
