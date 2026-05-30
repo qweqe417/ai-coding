@@ -49,7 +49,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-python "$PLUGIN_PATH/ai-coding/skills/diff-analyzer/run.py" "$1"
+python "$PLUGIN_PATH/skills/diff-analyzer/run.py" "$1"
 ```
 
 ## Arguments
@@ -58,7 +58,7 @@ python "$PLUGIN_PATH/ai-coding/skills/diff-analyzer/run.py" "$1"
 
 Example:
 ```bash
-python "$PLUGIN_PATH/ai-coding/skills/diff-analyzer/run.py" TC001
+python "$PLUGIN_PATH/skills/diff-analyzer/run.py" TC001
 ```
 
 ## Diff Categories

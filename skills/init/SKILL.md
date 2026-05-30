@@ -42,7 +42,7 @@ python -c "import yaml, requests, pymysql, redis, pymongo, pika, kafka, elastics
 }
 
 # Execute the init script
-python "$PLUGIN_PATH/ai-coding/skills/init/run.py"
+python "$PLUGIN_PATH/skills/init/run.py"
 ```
 
 ## Output

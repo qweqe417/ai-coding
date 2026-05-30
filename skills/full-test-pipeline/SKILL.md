@@ -43,7 +43,7 @@ if [ -z "$PLUGIN_PATH" ]; then
 fi
 
 # Execute the full-test-pipeline script
-python "$PLUGIN_PATH/ai-coding/skills/full-test-pipeline/run.py"
+python "$PLUGIN_PATH/skills/full-test-pipeline/run.py"
 ```
 
 ## Arguments

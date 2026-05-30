@@ -43,7 +43,7 @@ fi
 
 # Execute the integration-test script
 # Optional: specify test case IDs (space-separated)
-python "$PLUGIN_PATH/ai-coding/skills/integration-test/run.py" "$@"
+python "$PLUGIN_PATH/skills/integration-test/run.py" "$@"
 ```
 
 ## Arguments
@@ -55,13 +55,13 @@ python "$PLUGIN_PATH/ai-coding/skills/integration-test/run.py" "$@"
 Examples:
 ```bash
 # Execute all test cases
-python "$PLUGIN_PATH/ai-coding/skills/integration-test/run.py"
+python "$PLUGIN_PATH/skills/integration-test/run.py"
 
 # Execute specific test case
-python "$PLUGIN_PATH/ai-coding/skills/integration-test/run.py" TC001
+python "$PLUGIN_PATH/skills/integration-test/run.py" TC001
 
 # Execute multiple test cases
-python "$PLUGIN_PATH/ai-coding/skills/integration-test/run.py" TC001 TC002 TC003
+python "$PLUGIN_PATH/skills/integration-test/run.py" TC001 TC002 TC003
 ```
 
 ## Workflow
@@ -155,7 +155,7 @@ test:
 
 **Execute specific test cases:**
 ```bash
-python "$PLUGIN_PATH/ai-coding/skills/integration-test/run.py" TC001 TC002
+python "$PLUGIN_PATH/skills/integration-test/run.py" TC001 TC002
 ```
 
 **Skip service management (service already running):**

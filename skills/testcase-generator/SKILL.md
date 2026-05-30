@@ -40,7 +40,7 @@ if [ -z "$PLUGIN_PATH" ]; then
 fi
 
 # Execute the testcase-generator script
-python "$PLUGIN_PATH/ai-coding/skills/testcase-generator/run.py"
+python "$PLUGIN_PATH/skills/testcase-generator/run.py"
 ```
 
 ## Arguments

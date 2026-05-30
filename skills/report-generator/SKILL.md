@@ -43,7 +43,7 @@ if [ -z "$PLUGIN_PATH" ]; then
 fi
 
 # Execute the report-generator script
-python "$PLUGIN_PATH/ai-coding/skills/report-generator/run.py"
+python "$PLUGIN_PATH/skills/report-generator/run.py"
 ```
 
 ## Arguments

@@ -42,7 +42,7 @@ fi
 
 # Execute the assertion-generator script
 # Optional: specify test_case_id
-python "$PLUGIN_PATH/ai-coding/skills/assertion-generator/run.py" "$1"
+python "$PLUGIN_PATH/skills/assertion-generator/run.py" "$1"
 ```
 
 ## Arguments
@@ -127,10 +127,10 @@ assertion_generator:
 
 **Generate for all test cases:**
 ```bash
-python "$PLUGIN_PATH/ai-coding/skills/assertion-generator/run.py"
+python "$PLUGIN_PATH/skills/assertion-generator/run.py"
 ```
 
 **Generate for specific test case:**
 ```bash
-python "$PLUGIN_PATH/ai-coding/skills/assertion-generator/run.py" TC001
+python "$PLUGIN_PATH/skills/assertion-generator/run.py" TC001
 ```
