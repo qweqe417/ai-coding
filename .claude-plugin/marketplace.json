@@ -1,0 +1,20 @@
+{
+  "name": "ai-coding-marketplace",
+  "description": "AI Coding integration testing framework marketplace",
+  "owner": {
+    "name": "AI Coding Team",
+    "email": "contact@ai-coding.dev"
+  },
+  "plugins": [
+    {
+      "name": "ai-coding",
+      "description": "AI-powered integration testing framework with middleware validation",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "AI Coding Team",
+        "email": "contact@ai-coding.dev"
+      }
+    }
+  ]
+}

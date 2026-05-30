@@ -1,0 +1,92 @@
+{
+  "testcases": [
+    {
+      "id": "TC001",
+      "name": "创建用户",
+      "test_type": "backend",
+      "description": "测试创建用户API，验证MySQL和Redis数据",
+      "api": {
+        "method": "POST",
+        "url": "/api/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "username": "testuser",
+          "email": "test@example.com",
+          "age": 25
+        }
+      },
+      "expected_http": {
+        "status_code": 200,
+        "body": {
+          "code": 0,
+          "message": "success"
+        }
+      }
+    },
+    {
+      "id": "TC002",
+      "name": "查询用户",
+      "test_type": "backend",
+      "description": "测试查询用户API",
+      "api": {
+        "method": "GET",
+        "url": "/api/users/1001",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "expected_http": {
+        "status_code": 200,
+        "body": {
+          "code": 0,
+          "message": "success"
+        }
+      }
+    },
+    {
+      "id": "TC003",
+      "name": "更新用户",
+      "test_type": "backend",
+      "description": "测试更新用户API",
+      "api": {
+        "method": "PUT",
+        "url": "/api/users/1001",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "age": 26
+        }
+      },
+      "expected_http": {
+        "status_code": 200,
+        "body": {
+          "code": 0,
+          "message": "success"
+        }
+      }
+    },
+    {
+      "id": "TC004",
+      "name": "删除用户",
+      "test_type": "backend",
+      "description": "测试删除用户API",
+      "api": {
+        "method": "DELETE",
+        "url": "/api/users/1001",
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "expected_http": {
+        "status_code": 200,
+        "body": {
+          "code": 0,
+          "message": "success"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+test_case_id: TC001
+api: POST /api/users
+
+collection_steps:
+  - step: 1
+    name: 验证MySQL中用户记录
+    middleware: mysql
+    timing: after_api
+    query:
+      type: select
+      sql: "SELECT * FROM users WHERE username = 'testuser'"
+    validations:
+      - field: step_1.data.username
+        rule: equals
+        value: testuser
+        reason: 用户名应该正确保存到MySQL
+
+      - field: step_1.data.email
+        rule: equals
+        value: test@example.com
+        reason: 邮箱应该正确保存到MySQL
+
+      - field: step_1.data.age
+        rule: equals
+        value: 25
+        reason: 年龄应该正确保存到MySQL
+
+      - field: step_1.data.id
+        rule: not_null
+        reason: 用户ID应该自动生成
+
+  - step: 2
+    name: 验证Redis缓存
+    middleware: redis
+    timing: after_api
+    query:
+      type: get
+      key: "user:{response.data.id}"
+    validations:
+      - field: step_2.data.username
+        rule: equals
+        value: testuser
+        reason: Redis缓存应该包含用户名
+
+      - field: step_2.data.email
+        rule: equals
+        value: test@example.com
+        reason: Redis缓存应该包含邮箱
+
+expected_result:
+  step_1:
+    data:
+      username: testuser
+      email: test@example.com
+      age: 25
+  step_2:
+    data:
+      username: testuser
+      email: test@example.com
+
+expected_summary:
+  mysql_record: 用户记录应该正确保存到MySQL
+  redis_cache: 用户信息应该正确缓存到Redis

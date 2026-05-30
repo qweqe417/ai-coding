@@ -1,0 +1,112 @@
+version: 1.0.0
+
+project:
+  name: example-project
+  category: backend
+  language: java
+  framework: springboot
+  build_tool: maven
+  root: .
+
+directories:
+  specs: .ai-coding/specs
+  testcases: .ai-coding/testcases
+  plans: .ai-coding/plans
+  results: .ai-coding/results
+  analysis: .ai-coding/analysis
+  fixes: .ai-coding/fixes
+  reports: .ai-coding/reports
+  logs: .ai-coding/logs
+
+naming:
+  testcases: testcases.json
+  collection_plan: data-collection-plan-{test_case_id}.yaml
+  actual_result: actual-result-{test_case_id}.yaml
+  diff_result: diff-{test_case_id}.yaml
+  root_cause: root-cause-analysis-{test_case_id}.yaml
+  fix_record: fix-record-{test_case_id}.yaml
+  test_summary: test-summary.json
+  regression_result: regression-test-result.yaml
+  report_md: test-report.md
+  report_html: test-report.html
+  report_json: test-report.json
+
+service:
+  type: springboot
+  start_command: mvn spring-boot:run
+  health_check_url: http://localhost:8080/actuator/health
+  base_url: http://localhost:8080
+  startup_timeout: 60
+
+config_source:
+  type: auto
+  detected: local
+
+middleware:
+  mysql:
+    enabled: true
+    host: localhost
+    port: 3306
+    user: root
+    password: password
+    database: test_db
+    charset: utf8mb4
+
+  redis:
+    enabled: true
+    host: localhost
+    port: 6379
+    db: 0
+    decode_responses: true
+
+  mongodb:
+    enabled: false
+    host: localhost
+    port: 27017
+    database: test_db
+
+  rabbitmq:
+    enabled: false
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual_host: /
+
+  kafka:
+    enabled: false
+    bootstrap_servers:
+      - localhost:9092
+    group_id: ai-coding-test
+
+  elasticsearch:
+    enabled: false
+    hosts:
+      - http://localhost:9200
+
+test:
+  strategy: backend
+  max_regression_rounds: 3
+  auto_fix_enabled: true
+  auto_fix_confidence_threshold: 0.9
+  target_pass_rate: 0.95
+
+review:
+  pause_for_review: true
+  review_points:
+    - testcases
+    - collection_plans
+    - code_fixes
+  auto_continue: false
+
+git:
+  auto_commit: false
+  base_branch: main
+
+logging:
+  level: INFO
+  file: .ai-coding/logs/integration-test.log
+  max_size: 10MB
+  backup_count: 5
+
+spec_file: docs/spec.md
