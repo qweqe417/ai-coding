@@ -230,7 +230,7 @@ class ConfigManager:
             目录绝对路径
         """
         dir_path = self.config['directories'][dir_type]
-        full_path = os.path.join(self.project_root, dir_path)
+        full_path = os.path.normpath(os.path.join(self.project_root, dir_path))
 
         # 确保目录存在
         os.makedirs(full_path, exist_ok=True)
@@ -274,7 +274,7 @@ class ConfigManager:
         dir_type = dir_mapping[file_type]
         dir_path = self.get_directory(dir_type)
 
-        return os.path.join(dir_path, filename)
+        return os.path.normpath(os.path.join(dir_path, filename))
 
     def get(self, key: str, default: Any = None) -> Any:
         """获取配置项"""
