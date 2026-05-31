@@ -25,6 +25,22 @@ def analyze_code_with_ai(testcase, code_content, config):
     在Claude Code环境中，这个函数会被替换为实际的AI调用
     """
 
+    # 判断请求方法
+    method = testcase.api.method.upper()
+
+    # 提取参数（根据请求方法）
+    if method == 'GET':
+        # GET 请求从 URL 参数中提取
+        params = testcase.api.params if hasattr(testcase.api, 'params') and testcase.api.params else {}
+        # 如果没有参数，使用默认值
+        sample_field = list(params.keys())[0] if params else 'id'
+        sample_value = list(params.values())[0] if params else '1'
+    else:
+        # POST/PUT/DELETE 从 body 中提取
+        body = testcase.api.body if testcase.api.body else {}
+        sample_field = list(body.keys())[0] if body else 'id'
+        sample_value = list(body.values())[0] if body else 'test'
+
     # 构建AI提示词
     prompt = f"""你是一个集成测试专家。请分析以下代码，生成数据采集计划。
 
@@ -32,7 +48,7 @@ def analyze_code_with_ai(testcase, code_content, config):
 ID: {testcase.id}
 名称: {testcase.name}
 API: {testcase.api.method} {testcase.api.url}
-请求体: {json.dumps(testcase.api.body, indent=2, ensure_ascii=False)}
+请求参数: {json.dumps(params if method == 'GET' else body, indent=2, ensure_ascii=False)}
 
 代码:
 {code_content}
@@ -79,7 +95,35 @@ expected_result:
 
     # 在实际的Claude Code环境中，这里会调用AI
     # 这里返回一个示例计划作为占位
-    return f"""test_case_id: {testcase.id}
+
+    # 根据请求方法生成不同的查询
+    if method == 'GET':
+        # GET 请求通常是查询操作
+        return f"""test_case_id: {testcase.id}
+api: {testcase.api.method} {testcase.api.url}
+
+collection_steps:
+  - step: 1
+    name: 验证数据库查询结果
+    middleware: mysql
+    timing: after_api
+    query:
+      type: select
+      sql: "SELECT * FROM account WHERE {sample_field} = '{sample_value}'"
+    validations:
+      - field: step_1.data.{sample_field}
+        rule: equals
+        value: {sample_value}
+        reason: 查询结果应该包含正确的{sample_field}
+
+expected_result:
+  step_1:
+    data:
+      {sample_field}: {sample_value}
+"""
+    else:
+        # POST/PUT/DELETE 请求通常是写操作
+        return f"""test_case_id: {testcase.id}
 api: {testcase.api.method} {testcase.api.url}
 
 collection_steps:
@@ -89,17 +133,17 @@ collection_steps:
     timing: after_api
     query:
       type: select
-      sql: "SELECT * FROM users WHERE username = '{testcase.api.body.get('username', 'test')}'"
+      sql: "SELECT * FROM account WHERE {sample_field} = '{sample_value}'"
     validations:
-      - field: step_1.data.username
+      - field: step_1.data.{sample_field}
         rule: equals
-        value: {testcase.api.body.get('username', 'test')}
-        reason: 用户名应该正确保存到数据库
+        value: {sample_value}
+        reason: {sample_field}应该正确保存到数据库
 
 expected_result:
   step_1:
     data:
-      username: {testcase.api.body.get('username', 'test')}
+      {sample_field}: {sample_value}
 """
 
 
