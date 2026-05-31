@@ -31,7 +31,7 @@ class SnapshotStorage:
             'data': data
         }
 
-        file_path = os.path.join(output_dir, f"actual-result-{test_case_id}.yaml")
+        file_path = os.path.normpath(os.path.join(output_dir, f"actual-result-{test_case_id}.yaml"))
 
         with open(file_path, 'w', encoding='utf-8') as f:
             yaml.dump(snapshot, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
@@ -48,7 +48,7 @@ class SnapshotStorage:
         Returns:
             快照数据
         """
-        file_path = os.path.join(input_dir, f"actual-result-{test_case_id}.yaml")
+        file_path = os.path.normpath(os.path.join(input_dir, f"actual-result-{test_case_id}.yaml"))
 
         with open(file_path, 'r', encoding='utf-8') as f:
             snapshot = yaml.safe_load(f)

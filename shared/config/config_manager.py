@@ -16,7 +16,7 @@ class ConfigManager:
 
     def __init__(self, project_root: str = "."):
         self.project_root = os.path.abspath(project_root)
-        self.config_file = os.path.join(self.project_root, ".ai-coding", "config.yaml")
+        self.config_file = os.path.normpath(os.path.join(self.project_root, ".ai-coding", "config.yaml"))
         self.config: Optional[Dict[str, Any]] = None
 
         # 检查是否已初始化
@@ -31,7 +31,7 @@ class ConfigManager:
     def _auto_init(self):
         """自动初始化：创建目录和配置文件"""
         # 1. 创建 .ai-coding 目录
-        ai_coding_dir = os.path.join(self.project_root, ".ai-coding")
+        ai_coding_dir = os.path.normpath(os.path.join(self.project_root, ".ai-coding"))
         os.makedirs(ai_coding_dir, exist_ok=True)
 
         # 2. 自动检测项目信息
