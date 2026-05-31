@@ -28,7 +28,7 @@ Execute complete integration test workflow.
 
 ```bash
 # Find plugin installation path
-PLUGIN_PATH=$(find ~/.claude/plugins/cache -name "ai-coding" -type d | grep -E "ai-coding/[0-9]" | head -1)
+PLUGIN_PATH=$(find ~/.claude/plugins/cache -path "*/ai-coding-marketplace/ai-coding/*" -name "skills" -type d | head -1 | xargs dirname)
 
 # If not found in cache, try local
 if [ -z "$PLUGIN_PATH" ]; then
