@@ -1,117 +1,137 @@
 ---
 name: testcase-generator
-description: "Generate test cases from API specification documents using AI analysis"
+description: "从 API 规范文档生成测试用例"
 ---
 
-# testcase-generator - Test Case Generator
+# testcase-generator - 测试用例生成器
 
-AI-powered test case generation from specification documents.
+使用 AI 从规范文档自动生成测试用例。
 
-## What This Does
+## 重要规则
 
-- Parses API definitions from spec documents
-- Generates normal flow test cases
-- Generates boundary value test cases
-- Generates error flow test cases
-- Generates idempotent test cases
+**必须用中文与用户交流** - 所有输出、提示、摘要都必须使用中文。
 
-## Prerequisites
+## 功能说明
 
-- [ ] `.ai-coding/config.yaml` exists (run `/ai-coding:init` first)
-- [ ] Spec documents exist in `.ai-coding/specs/` or `docs/`
+- 解析 API 规范文档
+- 生成正常流程测试用例
+- 生成边界值测试用例
+- 生成异常流程测试用例
+- 生成幂等性测试用例
 
-## How To Execute
+## 前置条件
 
-**IMPORTANT:** You MUST execute the Python script using the Bash tool.
+- [ ] `.ai-coding/config.yaml` 已存在（先运行 `/ai-coding:init`）
+- [ ] 规范文档存在于 `.ai-coding/specs/` 或 `docs/` 目录
+
+## 执行步骤
+
+**重要：必须使用 Bash 工具执行 Python 脚本。**
 
 ```bash
-# Find plugin installation path
+# 查找插件安装路径
 PLUGIN_PATH=$(find ~/.claude/plugins/cache -path "*/ai-coding-marketplace/ai-coding/*" -name "skills" -type d | head -1 | xargs dirname)
 
-# If not found in cache, try local
+# 如果 cache 中没找到，尝试 local
 if [ -z "$PLUGIN_PATH" ]; then
     PLUGIN_PATH=$(find ~/.claude/plugins/local -name "ai-coding" -type d | head -1)
 fi
 
-# If still not found, report error
+# 如果还是没找到，报错
 if [ -z "$PLUGIN_PATH" ]; then
-    echo "❌ Error: ai-coding plugin not found"
+    echo "❌ 错误: 找不到 ai-coding 插件"
     exit 1
 fi
 
-# Execute the testcase-generator script
+# 执行测试用例生成脚本
 python "$PLUGIN_PATH/skills/testcase-generator/run.py"
 ```
 
-## Arguments
+## 参数说明
 
-No arguments required. The script will:
-1. Search for spec documents in `.ai-coding/specs/` and `docs/`
-2. Prompt you to select which spec to process
-3. Generate test cases automatically
+无需参数。脚本会：
+1. 在 `.ai-coding/specs/` 和 `docs/` 中搜索规范文档
+2. 提示你选择要处理的规范文档
+3. 自动生成测试用例
 
-## Output
+## 输出结果
 
-Generates `.ai-coding/testcases/testcases.json` containing:
-- Normal flow test cases
-- Boundary value test cases
-- Error flow test cases
-- Idempotent test cases (if applicable)
+生成 `.ai-coding/testcases/testcases.json`，包含：
+- 正常流程测试用例
+- 边界值测试用例
+- 异常流程测试用例
+- 幂等性测试用例（如适用）
 
-## After Execution
+## 执行完成后
 
-✅ Test cases generated successfully!
+用中文向用户展示：
 
-**Next steps:**
-- Review the generated test cases in `.ai-coding/testcases/testcases.json`
-- Manually add any special scenario test cases
-- Run `/ai-coding:assertion-generator` to generate data collection plans
+```
+✅ 测试用例生成成功！
 
-## Test Case Types
+📊 生成统计：
+- 正常流程用例: X 个
+- 边界值用例: X 个
+- 异常流程用例: X 个
+- 幂等性用例: X 个
+- 总计: X 个测试用例
 
-**Normal Flow:**
-- Valid input parameters
-- Expected success responses
+📁 输出文件：
+.ai-coding/testcases/testcases.json
 
-**Boundary Values:**
-- Minimum/maximum values
-- Empty/null values
-- Special characters
+📝 后续步骤：
+1. 查看生成的测试用例
+2. 手动添加特殊场景用例（如需要）
+3. 运行 /ai-coding:assertion-generator 生成数据采集计划
 
-**Error Flow:**
-- Missing required parameters
-- Invalid parameter types
-- Invalid parameter formats
-- Business rule violations
+需要我帮你生成数据采集计划吗？
+```
 
-**Idempotent:**
-- Repeated identical requests
-- Verify result consistency
+## 测试用例类型
 
-## Configuration
+**正常流程：**
+- 有效的输入参数
+- 预期成功响应
 
-Edit `.ai-coding/config.yaml` to configure:
+**边界值：**
+- 最小/最大值
+- 空值/null 值
+- 特殊字符
+
+**异常流程：**
+- 缺少必需参数
+- 无效参数类型
+- 无效参数格式
+- 业务规则违反
+
+**幂等性：**
+- 重复相同请求
+- 验证结果一致性
+
+## 配置说明
+
+编辑 `.ai-coding/config.yaml` 配置：
 
 ```yaml
 testcase_generator:
   model: claude-sonnet-4
-  normal_cases: 1
-  boundary_cases: 2
-  error_cases: 3
-  generate_idempotent: true
-  data_strategy: realistic
+  normal_cases: 1      # 每个 API 生成的正常用例数
+  boundary_cases: 2    # 边界值用例数
+  error_cases: 3       # 异常用例数
+  generate_idempotent: true  # 是否生成幂等性用例
+  data_strategy: realistic   # 数据生成策略
 ```
 
-## Error Handling
+## 错误处理
 
-**Error: No spec documents found**
-- Create spec documents in `.ai-coding/specs/` or `docs/`
-- Ensure spec documents contain API definitions
+**错误：找不到规范文档**
+- 在 `.ai-coding/specs/` 或 `docs/` 中创建规范文档
+- 确保规范文档包含 API 定义
 
-**Error: AI analysis failed**
-- Check if the spec document format is correct
-- Ensure API definitions are clear and complete
+**错误：AI 分析失败**
+- 检查规范文档格式是否正确
+- 确保 API 定义清晰完整
 
-**Error: Cannot write test cases**
-- Check if `.ai-coding/testcases/` directory exists
-- Check file permissions
+**错误：无法写入测试用例**
+- 检查 `.ai-coding/testcases/` 目录是否存在
+- 检查文件权限
