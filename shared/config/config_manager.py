@@ -102,14 +102,52 @@ class ConfigManager:
         auto_reader = AutoConfigReader(self.project_root)
         detected_middleware = auto_reader.detect_middleware_configs()
 
-        # 合并自动检测和默认配置
+        # 合并自动检测和默认配置（带完整配置项和注释）
         config['middleware'] = {
-            'mysql': detected_middleware.get('mysql', {'enabled': False}),
-            'redis': detected_middleware.get('redis', {'enabled': False}),
-            'mongodb': detected_middleware.get('mongodb', {'enabled': False}),
-            'rabbitmq': detected_middleware.get('rabbitmq', {'enabled': False}),
-            'kafka': detected_middleware.get('kafka', {'enabled': False}),
-            'elasticsearch': detected_middleware.get('elasticsearch', {'enabled': False})
+            'mysql': detected_middleware.get('mysql', {
+                'enabled': True,
+                'host': 'localhost',
+                'port': 3306,
+                'user': 'root',
+                'password': '',  # 填写你的 MySQL 密码
+                'database': 'test_db',  # 填写你的数据库名
+                'charset': 'utf8mb4'
+            }),
+            'redis': detected_middleware.get('redis', {
+                'enabled': True,
+                'host': 'localhost',
+                'port': 6379,
+                'password': '',  # 如果有密码，填在这里
+                'db': 0,
+                'decode_responses': True
+            }),
+            'mongodb': detected_middleware.get('mongodb', {
+                'enabled': False,
+                'host': 'localhost',
+                'port': 27017,
+                'database': 'test_db',
+                'username': '',  # 如果需要认证
+                'password': ''
+            }),
+            'rabbitmq': detected_middleware.get('rabbitmq', {
+                'enabled': False,
+                'host': 'localhost',
+                'port': 5672,
+                'username': 'guest',
+                'password': 'guest',
+                'virtual_host': '/'
+            }),
+            'kafka': detected_middleware.get('kafka', {
+                'enabled': False,
+                'bootstrap_servers': ['localhost:9092'],
+                'group_id': 'ai-coding-test'
+            }),
+            'elasticsearch': detected_middleware.get('elasticsearch', {
+                'enabled': False,
+                'hosts': ['http://localhost:9200'],
+                'username': '',  # 如果需要认证
+                'password': ''
+            })
         }
 
         # 测试配置
@@ -206,6 +244,15 @@ class ConfigManager:
                 service_config['start_command'] = 'npm run dev'
             elif project_type.build_tool == 'yarn':
                 service_config['start_command'] = 'yarn dev'
+
+        # 添加认证配置模板
+        service_config['auth'] = {
+            'enabled': False,
+            'type': 'token',  # token | basic | oauth2
+            'token': '',  # 填写你的 API Token
+            'header_name': 'Authorization',
+            'header_prefix': 'Bearer'
+        }
             elif project_type.build_tool == 'pnpm':
                 service_config['start_command'] = 'pnpm dev'
 
