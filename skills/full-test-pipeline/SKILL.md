@@ -100,6 +100,10 @@ description: "执行完整的测试流程（从生成测试用例到报告）"
 
 ### [3/6] 执行集成测试
 
+**⚠️ 重要：请确保服务已启动！**
+
+在执行测试前，请先在 IDE 或命令行中启动服务。
+
 **调用 integration-test 脚本：**
 
 使用 Bash 工具执行：
@@ -112,8 +116,8 @@ if [ -z "$PLUGIN_PATH" ]; then
     PLUGIN_PATH=$(find ~/.claude/plugins/local -name "ai-coding" -type d | head -1)
 fi
 
-# 执行集成测试
-python "$PLUGIN_PATH/skills/integration-test/run.py"
+# 执行集成测试（跳过服务启动）
+python "$PLUGIN_PATH/skills/integration-test/run.py" --skip-service-start
 ```
 
 **显示进度：**
@@ -121,7 +125,7 @@ python "$PLUGIN_PATH/skills/integration-test/run.py"
 [3/6] 执行集成测试
    ✓ 加载配置
    ✓ 加载测试用例: 26 个
-   ✓ 启动服务...
+   ✓ 跳过服务启动（使用已运行的服务）
    ✓ 执行测试...
       [1/26] TC001: PASS (0.5s)
       [2/26] TC002: PASS (0.4s)

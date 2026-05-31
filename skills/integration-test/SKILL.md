@@ -13,7 +13,6 @@ description: "执行集成测试并验证中间件数据"
 
 ## 功能说明
 
-- 启动服务
 - 执行 API 调用
 - 采集中间件数据
 - 验证数据正确性
@@ -24,11 +23,18 @@ description: "执行集成测试并验证中间件数据"
 - [ ] `.ai-coding/config.yaml` 已存在
 - [ ] 测试用例已生成
 - [ ] 数据采集计划已生成
-- [ ] 中间件已配置并运行
+- [ ] **服务已启动**（在 IDE 或命令行中手动启动）
+- [ ] 中间件已配置并运行（MySQL、Redis 等）
 
 ## 执行步骤
 
 **重要：必须使用 Bash 工具执行 Python 脚本。**
+
+**开发环境模式（推荐）：**
+
+1. 先在 IDE 或命令行中启动服务
+2. 确保服务可访问（如 http://localhost:8080）
+3. 运行集成测试：
 
 ```bash
 # 查找插件安装路径
@@ -43,8 +49,17 @@ if [ -z "$PLUGIN_PATH" ]; then
     exit 1
 fi
 
-# 执行集成测试
-python "$PLUGIN_PATH/skills/integration-test/run.py" "$1"
+# 执行集成测试（跳过服务启动）
+python "$PLUGIN_PATH/skills/integration-test/run.py" --skip-service-start
+```
+
+**CI/CD 模式（自动启动服务）：**
+
+如果需要脚本自动启动服务（不推荐开发环境使用）：
+
+```bash
+# 不加 --skip-service-start 参数
+python "$PLUGIN_PATH/skills/integration-test/run.py"
 ```
 
 ## 参数说明
@@ -80,14 +95,16 @@ python "$PLUGIN_PATH/skills/integration-test/run.py" "$1"
 
 ## 错误处理
 
-**错误：服务启动失败**
-- 检查服务启动命令是否正确
-- 检查端口是否被占用
+**错误：服务未启动或不可访问**
+- 检查服务是否正在运行
+- 检查服务地址和端口是否正确
+- 检查防火墙设置
 
 **错误：中间件连接失败**
 - 检查中间件是否运行
 - 检查配置文件中的连接信息
 
 **错误：API 调用失败**
-- 检查服务是否正常启动
 - 检查 API 路径是否正确
+- 检查请求参数是否正确
+- 查看服务日志了解详细错误
