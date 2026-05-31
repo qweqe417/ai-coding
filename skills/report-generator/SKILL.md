@@ -5,7 +5,7 @@ description: "生成测试报告（HTML、Markdown、JSON 格式）"
 
 # report-generator - 测试报告生成器
 
-生成全面的测试报告，包含图表和趋势分析。
+生成全面的测试报告，包含图表和统计。
 
 ## 重要规则
 
@@ -15,79 +15,301 @@ description: "生成测试报告（HTML、Markdown、JSON 格式）"
 
 - 汇总测试结果
 - 生成多格式报告（HTML、Markdown、JSON）
-- 生成图表和统计
-- 趋势分析
+- 生成统计图表
+- 分析失败原因
 
 ## 前置条件
 
 - [ ] 集成测试已执行
-- [ ] 存在测试结果
+- [ ] 存在测试结果文件
 
 ## 执行步骤
 
-**重要：必须使用 Bash 工具执行 Python 脚本。**
+**重要：你必须按顺序执行以下所有步骤，不能跳过！**
 
-```bash
-PLUGIN_PATH=$(find ~/.claude/plugins/cache -path "*/ai-coding-marketplace/ai-coding/*" -name "skills" -type d | head -1 | xargs dirname)
+### 1. 收集测试结果
 
-if [ -z "$PLUGIN_PATH" ]; then
-    PLUGIN_PATH=$(find ~/.claude/plugins/local -name "ai-coding" -type d | head -1)
-fi
+使用 Glob 工具查找 `.ai-coding/results/diff-*.yaml`
 
-if [ -z "$PLUGIN_PATH" ]; then
-    echo "❌ 错误: 找不到 ai-coding 插件"
-    exit 1
-fi
+使用 Read 工具读取所有测试结果文件。
 
-python "$PLUGIN_PATH/skills/report-generator/run.py"
+如果没有找到结果文件，用中文提示：
+```
+❌ 错误: 找不到测试结果
+请先运行集成测试：
+/ai-coding:integration-test
 ```
 
-## 输出结果
+### 2. 收集差异分析
 
-生成以下报告文件：
-- `.ai-coding/reports/test-report.html`
-- `.ai-coding/reports/test-report.md`
-- `.ai-coding/reports/test-report.json`
+使用 Glob 工具查找 `.ai-coding/analysis/root-cause-*.yaml`
 
-## 执行完成后
+使用 Read 工具读取所有差异分析文件（如果有）。
 
-用中文向用户展示：
+### 3. 收集修复记录
+
+使用 Glob 工具查找 `.ai-coding/fixes/fix-record-*.yaml` 或 `.ai-coding/fixes/fix-plan-*.yaml`
+
+使用 Read 工具读取所有修复记录文件（如果有）。
+
+### 4. 统计数据
+
+计算以下统计信息：
+
+**基础统计：**
+- 总用例数
+- 通过数量
+- 失败数量
+- 通过率（百分比）
+
+**问题分类统计：**
+- Real Bug 数量
+- Timing Issue 数量
+- Environment Issue 数量
+- Assertion Issue 数量
+
+**修复统计：**
+- 已修复数量
+- 待修复数量
+
+### 5. 生成 HTML 报告
+
+使用 Write 工具保存到 `.ai-coding/reports/test-report.html`
+
+**HTML 格式要求：**
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>集成测试报告</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }
+        h2 { color: #555; margin-top: 30px; }
+        .summary { background: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .stat { display: inline-block; margin: 10px 30px; text-align: center; }
+        .stat-value { font-size: 36px; font-weight: bold; display: block; }
+        .stat-label { color: #666; font-size: 14px; }
+        .pass { color: #4CAF50; }
+        .fail { color: #f44336; }
+        .warning { color: #ff9800; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #4CAF50; color: white; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f5f5f5; }
+        .badge { padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .badge-pass { background: #4CAF50; color: white; }
+        .badge-fail { background: #f44336; color: white; }
+        .chart { margin: 20px 0; padding: 20px; background: #f9f9f9; border-radius: 5px; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 集成测试报告</h1>
+        
+        <div class="summary">
+            <h2>📊 执行摘要</h2>
+            <div class="stat">
+                <span class="stat-value">{总用例数}</span>
+                <span class="stat-label">总用例数</span>
+            </div>
+            <div class="stat pass">
+                <span class="stat-value">{通过数}</span>
+                <span class="stat-label">通过 ({通过率}%)</span>
+            </div>
+            <div class="stat fail">
+                <span class="stat-value">{失败数}</span>
+                <span class="stat-label">失败</span>
+            </div>
+            <div class="stat warning">
+                <span class="stat-value">{已修复数}</span>
+                <span class="stat-label">已修复</span>
+            </div>
+        </div>
+
+        <h2>📋 测试用例详情</h2>
+        <table>
+            <tr>
+                <th>测试用例 ID</th>
+                <th>状态</th>
+                <th>通过检查</th>
+                <th>失败检查</th>
+                <th>问题类型</th>
+            </tr>
+            <!-- 为每个测试用例生成一行 -->
+            <tr>
+                <td>TC001</td>
+                <td><span class="badge badge-pass">PASS</span></td>
+                <td>5</td>
+                <td>0</td>
+                <td>-</td>
+            </tr>
+        </table>
+
+        <h2>🐛 问题分类统计</h2>
+        <div class="chart">
+            <ul>
+                <li>Real Bug: X 个</li>
+                <li>Timing Issue: X 个</li>
+                <li>Environment Issue: X 个</li>
+                <li>Assertion Issue: X 个</li>
+            </ul>
+        </div>
+
+        <h2>🔧 修复记录</h2>
+        <table>
+            <tr>
+                <th>测试用例 ID</th>
+                <th>问题类型</th>
+                <th>修复状态</th>
+                <th>置信度</th>
+            </tr>
+            <!-- 为每个修复记录生成一行 -->
+        </table>
+
+        <div class="footer">
+            <p>生成时间: {当前时间}</p>
+            <p>🤖 Generated by AI Coding Framework</p>
+        </div>
+    </div>
+</body>
+</html>
+```
+
+### 6. 生成 Markdown 报告
+
+使用 Write 工具保存到 `.ai-coding/reports/test-report.md`
+
+**Markdown 格式：**
+
+```markdown
+# 集成测试报告
+
+生成时间: {当前时间}
+
+## 执行摘要
+
+- **总用例数**: X
+- **通过**: X (X%)
+- **失败**: X
+- **已修复**: X
+
+## 测试用例详情
+
+| 测试用例 ID | 状态 | 通过检查 | 失败检查 | 问题类型 |
+|------------|------|---------|---------|---------|
+| TC001      | PASS | 5       | 0       | -       |
+| TC002      | FAIL | 3       | 2       | Real Bug |
+
+## 问题分类统计
+
+- Real Bug: X 个
+- Timing Issue: X 个
+- Environment Issue: X 个
+- Assertion Issue: X 个
+
+## 修复记录
+
+| 测试用例 ID | 问题类型 | 修复状态 | 置信度 |
+|------------|---------|---------|--------|
+| TC002      | Real Bug | success | 92%    |
+
+## 失败用例详情
+
+### TC002 - 用户注册失败
+
+**问题类型**: Real Bug
+
+**根本原因**:
+UserService.create()方法中缺少设置Redis缓存的代码。
+
+**修复建议**:
+在 UserService.create() 方法中添加 Redis 缓存操作。
+
+---
+
+🤖 Generated by AI Coding Framework
+```
+
+### 7. 生成 JSON 报告
+
+使用 Write 工具保存到 `.ai-coding/reports/test-report.json`
+
+**JSON 格式：**
+
+```json
+{
+  "generated_at": "2026-05-31T10:30:00",
+  "summary": {
+    "total": 10,
+    "passed": 8,
+    "failed": 2,
+    "pass_rate": 80,
+    "fixes_applied": 1
+  },
+  "test_results": [
+    {
+      "test_case_id": "TC001",
+      "status": "PASS",
+      "passed_checks": 5,
+      "failed_checks": 0
+    }
+  ],
+  "bug_types": {
+    "Real Bug": 2,
+    "Timing Issue": 0,
+    "Environment Issue": 0,
+    "Assertion Issue": 0
+  },
+  "fixes": [
+    {
+      "test_case_id": "TC002",
+      "category": "Real Bug",
+      "fix_status": "success",
+      "confidence": 0.92
+    }
+  ]
+}
+```
+
+### 8. 显示中文摘要
+
+**必须用中文**向用户展示：
 
 ```
 ✅ 测试报告生成成功！
 
-📊 报告统计：
-- 测试用例总数: X 个
-- 通过率: X%
-- 失败用例: X 个
-- 执行时间: X 秒
+📊 测试统计：
+- 总用例数: X 个
+- 通过: X 个 (X%)
+- 失败: X 个
+- 已修复: X 个
 
 📁 报告文件：
 - HTML: .ai-coding/reports/test-report.html
 - Markdown: .ai-coding/reports/test-report.md
 - JSON: .ai-coding/reports/test-report.json
 
+🌐 在浏览器中打开 HTML 报告：
+file:///{绝对路径}/test-report.html
+
 📝 后续步骤：
-1. 在浏览器中打开 HTML 报告查看详情
-2. 将报告分享给团队
-3. 归档测试结果
+1. 在浏览器中查看 HTML 报告
+2. 分析失败原因
+3. 修复失败的测试用例
 
 需要我帮你打开 HTML 报告吗？
 ```
 
-## 报告内容
+## 注意事项
 
-**概览：**
-- 测试统计
-- 通过率趋势
-- 执行时间分布
-
-**详细结果：**
-- 每个测试用例的执行结果
-- 失败原因分析
-- 中间件验证详情
-
-**趋势分析：**
-- 历史通过率
-- 性能趋势
-- 问题分类统计
+- HTML 报告必须包含完整的 CSS 样式
+- 表格必须包含所有测试用例
+- 统计数据必须准确
+- 时间格式使用 ISO 8601
+- 所有与用户的交互必须使用中文
