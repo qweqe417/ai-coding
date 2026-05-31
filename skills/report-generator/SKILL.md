@@ -1,92 +1,93 @@
 ---
 name: report-generator
-description: "Generate comprehensive test reports in HTML, Markdown, and JSON formats with charts and trend analysis"
+description: "生成测试报告（HTML、Markdown、JSON 格式）"
 ---
 
-# report-generator - Report Generator
+# report-generator - 测试报告生成器
 
-Generate comprehensive test reports in multiple formats.
+生成全面的测试报告，包含图表和趋势分析。
 
-## What This Does
+## 重要规则
 
-Generates complete test reports:
-- Test results summary
-- Test case details
-- Data change records
-- Diff analysis results
-- Fix records
-- Trend analysis
-- Coverage statistics
+**必须用中文与用户交流** - 所有输出、提示、摘要都必须使用中文。
 
-## Prerequisites
+## 功能说明
 
-- [ ] Tests have been executed (run `/ai-coding:integration-test` first)
-- [ ] Test results exist in `.ai-coding/results/`
+- 汇总测试结果
+- 生成多格式报告（HTML、Markdown、JSON）
+- 生成图表和统计
+- 趋势分析
 
-## How To Execute
+## 前置条件
 
-**IMPORTANT:** You MUST execute the Python script using the Bash tool.
+- [ ] 集成测试已执行
+- [ ] 存在测试结果
+
+## 执行步骤
+
+**重要：必须使用 Bash 工具执行 Python 脚本。**
 
 ```bash
-# Find plugin installation path
 PLUGIN_PATH=$(find ~/.claude/plugins/cache -path "*/ai-coding-marketplace/ai-coding/*" -name "skills" -type d | head -1 | xargs dirname)
 
-# If not found in cache, try local
 if [ -z "$PLUGIN_PATH" ]; then
     PLUGIN_PATH=$(find ~/.claude/plugins/local -name "ai-coding" -type d | head -1)
 fi
 
-# If still not found, report error
 if [ -z "$PLUGIN_PATH" ]; then
-    echo "❌ Error: ai-coding plugin not found"
+    echo "❌ 错误: 找不到 ai-coding 插件"
     exit 1
 fi
 
-# Execute the report-generator script
 python "$PLUGIN_PATH/skills/report-generator/run.py"
 ```
 
-## Arguments
+## 输出结果
 
-No arguments required. The script will generate reports for the latest test execution.
+生成以下报告文件：
+- `.ai-coding/reports/test-report.html`
+- `.ai-coding/reports/test-report.md`
+- `.ai-coding/reports/test-report.json`
 
-## Output Formats
+## 执行完成后
 
-Generates three report formats:
-- `.ai-coding/reports/test-report.html` - Interactive HTML report with charts
-- `.ai-coding/reports/test-report.md` - Markdown report for documentation
-- `.ai-coding/reports/test-report.json` - JSON report for programmatic access
+用中文向用户展示：
 
-## Report Contents
+```
+✅ 测试报告生成成功！
 
-1. **Execution Summary** - Pass rate, duration, timestamp
-2. **Test Case Details** - Status, duration, API calls, data changes
-3. **Data Change Statistics** - MySQL, Redis, MongoDB, etc.
-4. **Diff Analysis Summary** - Categorized failures
-5. **Fix Records** - Applied fixes and verification results
-6. **Trend Analysis** - Historical pass rate trends
-7. **Coverage Statistics** - API, database, middleware coverage
+📊 报告统计：
+- 测试用例总数: X 个
+- 通过率: X%
+- 失败用例: X 个
+- 执行时间: X 秒
 
-## After Execution
+📁 报告文件：
+- HTML: .ai-coding/reports/test-report.html
+- Markdown: .ai-coding/reports/test-report.md
+- JSON: .ai-coding/reports/test-report.json
 
-✅ Reports generated successfully!
+📝 后续步骤：
+1. 在浏览器中打开 HTML 报告查看详情
+2. 将报告分享给团队
+3. 归档测试结果
 
-**Generated files:**
-- HTML: `.ai-coding/reports/test-report.html`
-- Markdown: `.ai-coding/reports/test-report.md`
-- JSON: `.ai-coding/reports/test-report.json`
+需要我帮你打开 HTML 报告吗？
+```
 
-**Next steps:**
-- Open HTML report in browser for interactive view
-- Share Markdown report in documentation
-- Use JSON report for CI/CD integration
+## 报告内容
 
-## Error Handling
+**概览：**
+- 测试统计
+- 通过率趋势
+- 执行时间分布
 
-**Error: No test results found**
-- Run `/ai-coding:integration-test` first
-- Check if `.ai-coding/results/` directory exists
+**详细结果：**
+- 每个测试用例的执行结果
+- 失败原因分析
+- 中间件验证详情
 
-**Error: Cannot generate charts**
-- Charts require test history data
-- Run tests multiple times to build history
+**趋势分析：**
+- 历史通过率
+- 性能趋势
+- 问题分类统计

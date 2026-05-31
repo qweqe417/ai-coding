@@ -1,136 +1,119 @@
 ---
 name: assertion-generator
-description: "Generate data collection plans by analyzing code and tracking data flow across middleware (MySQL, Redis, MongoDB, etc.)"
+description: "通过分析代码生成数据采集计划"
 ---
 
-# assertion-generator - Data Collection Plan Generator
+# assertion-generator - 数据采集计划生成器
 
-**Core Skill** - AI analyzes code to automatically generate data collection plans.
+**核心功能** - AI 分析代码自动生成数据采集计划。
 
-## What This Does
+## 重要规则
 
-This is the core skill of the framework. It uses AI to:
-- Identify API data flow
-- Track data flow across middleware (MySQL, Redis, MongoDB, Kafka, etc.)
-- Generate complete data collection plans
-- Generate validation rules
+**必须用中文与用户交流** - 所有输出、提示、摘要都必须使用中文。
 
-## Prerequisites
+## 功能说明
 
-- [ ] `.ai-coding/config.yaml` exists (run `/ai-coding:init` first)
-- [ ] Test cases exist in `.ai-coding/testcases/` (run `/ai-coding:testcase-generator` first)
-- [ ] Project source code is accessible
+这是框架的核心功能。使用 AI：
+- 识别 API 数据流
+- 跟踪跨中间件的数据流（MySQL、Redis、MongoDB、Kafka 等）
+- 生成完整的数据采集计划
+- 生成验证规则
 
-## How To Execute
+## 前置条件
 
-**IMPORTANT:** You MUST execute the Python script using the Bash tool.
+- [ ] `.ai-coding/config.yaml` 已存在（先运行 `/ai-coding:init`）
+- [ ] 测试用例已存在于 `.ai-coding/testcases/`（先运行 `/ai-coding:testcase-generator`）
+- [ ] 项目源代码可访问
+
+## 执行步骤
+
+**重要：必须使用 Bash 工具执行 Python 脚本。**
 
 ```bash
-# Find plugin installation path
+# 查找插件安装路径
 PLUGIN_PATH=$(find ~/.claude/plugins/cache -path "*/ai-coding-marketplace/ai-coding/*" -name "skills" -type d | head -1 | xargs dirname)
 
-# If not found in cache, try local
+# 如果 cache 中没找到，尝试 local
 if [ -z "$PLUGIN_PATH" ]; then
     PLUGIN_PATH=$(find ~/.claude/plugins/local -name "ai-coding" -type d | head -1)
 fi
 
-# If still not found, report error
+# 如果还是没找到，报错
 if [ -z "$PLUGIN_PATH" ]; then
-    echo "❌ Error: ai-coding plugin not found"
+    echo "❌ 错误: 找不到 ai-coding 插件"
     exit 1
 fi
 
-# Execute the assertion-generator script
-# Optional: specify test_case_id
+# 执行数据采集计划生成脚本
+# 可选：指定 test_case_id
 python "$PLUGIN_PATH/skills/assertion-generator/run.py" "$1"
 ```
 
-## Arguments
+## 参数说明
 
-- `test_case_id` (optional): Specific test case ID to generate plan for
-  - If provided: generates plan for that test case only
-  - If omitted: generates plans for all test cases
+- `test_case_id`（可选）：指定要生成计划的测试用例 ID
 
-## Output
+## 输出结果
 
-Generates `.ai-coding/plans/data-collection-plan-{test_case_id}.yaml` for each test case.
+为每个测试用例生成 `.ai-coding/plans/data-collection-plan-{test_case_id}.yaml`
 
-Each plan contains:
-- Collection steps (what data to collect from which middleware)
-- Validation rules (what to verify)
-- Expected results
+## 执行完成后
 
-## After Execution
+用中文向用户展示：
 
-✅ Data collection plans generated successfully!
+```
+✅ 数据采集计划生成成功！
 
-**Next steps:**
-- Review the generated plans in `.ai-coding/plans/`
-- Manually adjust complex data flows if needed
-- Run `/ai-coding:integration-test` to execute tests with the plans
+📊 生成统计：
+- 已处理测试用例: X 个
+- 生成的采集计划: X 个
 
-## AI Analysis Strategy
+📁 输出目录：
+.ai-coding/plans/
 
-**1. Code Path Tracking**
+📝 后续步骤：
+1. 查看生成的数据采集计划
+2. 根据实际数据库表结构调整 SQL 查询
+3. 运行 /ai-coding:integration-test 执行集成测试
 
-Traces from Controller → Service → Repository:
-- Identifies API entry point
-- Follows method calls
-- Tracks data transformations
+需要我帮你执行集成测试吗？
+```
 
-**2. Data Flow Identification**
-
-Detects middleware operations:
-- **MySQL**: `save()`, `insert()`, `update()`, `delete()`
-- **Redis**: `set()`, `hset()`, `setex()`
-- **MongoDB**: `insert()`, `save()`, `updateOne()`
-- **RabbitMQ**: `send()`, `publish()`
-- **Kafka**: `send()`, `produce()`
-- **Elasticsearch**: `index()`, `update()`
-
-**3. Validation Rule Generation**
-
-Creates rules based on code logic:
-- Field values are correctly saved
-- Data types are correct
-- Related data is consistent
-- Cache is updated
-
-## Configuration
-
-Edit `.ai-coding/config.yaml` to configure:
+## 数据采集计划格式
 
 ```yaml
-assertion_generator:
-  model: claude-opus-4
-  analysis_depth: 3
-  include_code_snippets: true
-  validation_strategy: comprehensive
+test_case_id: TC001
+api: POST /api/users
+
+collection_steps:
+  - step: 1
+    name: 验证数据库记录
+    middleware: mysql
+    timing: after_api
+    query:
+      type: select
+      sql: "SELECT * FROM users WHERE username = 'test'"
+    validations:
+      - field: step_1.data.username
+        rule: equals
+        value: test
+        reason: 用户名应该正确保存到数据库
+
+expected_result:
+  step_1:
+    data:
+      username: test
 ```
 
-## Error Handling
+## 错误处理
 
-**Error: Test case not found**
-- Run `/ai-coding:testcase-generator` first
-- Check if test case ID exists in `.ai-coding/testcases/testcases.json`
+**错误：找不到测试用例文件**
+- 先运行 `/ai-coding:testcase-generator` 生成测试用例
 
-**Error: Cannot access source code**
-- Ensure project source code is in the current directory
-- Check file permissions
+**错误：找不到源代码**
+- 确保在项目根目录执行
+- 检查项目结构是否正确
 
-**Error: AI analysis failed**
-- Code structure may be too complex
-- Try specifying code path manually
-- Consider manual plan creation
-
-## Advanced Usage
-
-**Generate for all test cases:**
-```bash
-python "$PLUGIN_PATH/skills/assertion-generator/run.py"
-```
-
-**Generate for specific test case:**
-```bash
-python "$PLUGIN_PATH/skills/assertion-generator/run.py" TC001
-```
+**错误：AI 分析失败**
+- 检查代码是否可读
+- 确保 API 实现清晰

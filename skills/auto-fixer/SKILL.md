@@ -1,107 +1,88 @@
 ---
 name: auto-fixer
-description: "Automatically fix code issues based on root cause analysis with confidence-based strategies"
+description: "基于根因分析自动修复代码问题"
 ---
 
-# auto-fixer - Auto Fixer
+# auto-fixer - 自动修复器
 
-AI-powered automatic code fixing based on root cause analysis.
+根据根因分析自动修复代码问题。
 
-## What This Does
+## 重要规则
 
-Automatically fixes code based on analysis:
-- Reads root cause analysis reports
-- Evaluates fix confidence
-- Locates problem code
-- Generates fix solutions
-- Applies fixes (high confidence) or creates fix plans (low confidence)
-- Re-runs tests for verification
+**必须用中文与用户交流** - 所有输出、提示、摘要都必须使用中文。
 
-## Prerequisites
+## 功能说明
 
-- [ ] Root cause analysis exists (run `/ai-coding:diff-analyzer {test_case_id}` first)
-- [ ] Analysis report in `.ai-coding/analysis/root-cause-{test_case_id}.yaml`
+- 读取根因分析结果
+- 生成修复方案
+- 自动修改代码
+- 验证修复效果
 
-## How To Execute
+## 前置条件
 
-**IMPORTANT:** You MUST execute the Python script using the Bash tool.
+- [ ] 差异分析已完成
+- [ ] 存在可修复的问题
+
+## 执行步骤
+
+**重要：必须使用 Bash 工具执行 Python 脚本。**
 
 ```bash
-# Find plugin installation path
 PLUGIN_PATH=$(find ~/.claude/plugins/cache -path "*/ai-coding-marketplace/ai-coding/*" -name "skills" -type d | head -1 | xargs dirname)
 
-# If not found in cache, try local
 if [ -z "$PLUGIN_PATH" ]; then
     PLUGIN_PATH=$(find ~/.claude/plugins/local -name "ai-coding" -type d | head -1)
 fi
 
-# If still not found, report error
 if [ -z "$PLUGIN_PATH" ]; then
-    echo "❌ Error: ai-coding plugin not found"
-    exit 1
-fi
-
-# Execute the auto-fixer script
-# Required: test_case_id
-if [ -z "$1" ]; then
-    echo "❌ Error: test_case_id is required"
-    echo "Usage: /ai-coding:auto-fixer <test_case_id>"
+    echo "❌ 错误: 找不到 ai-coding 插件"
     exit 1
 fi
 
 python "$PLUGIN_PATH/skills/auto-fixer/run.py" "$1"
 ```
 
-## Arguments
+## 参数说明
 
-- `test_case_id` (required): Test case ID to fix
+- `test_case_id`（可选）：指定要修复的测试用例 ID
 
-Example:
-```bash
-python "$PLUGIN_PATH/skills/auto-fixer/run.py" TC001
+## 输出结果
+
+生成 `.ai-coding/fixes/fix-record-{test_case_id}.yaml`
+
+## 执行完成后
+
+用中文向用户展示：
+
+```
+✅ 自动修复完成！
+
+📊 修复结果：
+- 成功修复: X 个
+- 需要人工介入: X 个
+- 总计: X 个
+
+📁 修复记录：
+.ai-coding/fixes/
+
+📝 后续步骤：
+1. 查看修复记录
+2. 重新运行 /ai-coding:integration-test 验证修复
+3. 提交代码变更
+
+需要我帮你重新运行测试吗？
 ```
 
-## Fix Strategies
+## 修复策略
 
-**High Confidence (≥0.9):** Auto-fix without confirmation
-**Medium Confidence (0.7-0.9):** Generate fix plan, wait for confirmation
-**Low Confidence (<0.7):** Generate suggestions only
+**高置信度（自动修复）：**
+- 简单逻辑错误
+- 明显的类型错误
 
-## Output
+**中置信度（建议修复）：**
+- 业务逻辑调整
+- 复杂的条件判断
 
-Generates `.ai-coding/fixes/fix-plan-{test_case_id}.yaml` containing:
-- Fix status
-- Changes made
-- Verification results
-- Before/after code
-
-## After Execution
-
-**If fix succeeded:**
-✅ Fix applied and verified!
-
-**Next steps:**
-- Review changes in the source files
-- Run `/ai-coding:integration-test` for full regression test
-
-**If fix failed:**
-❌ Fix could not be applied automatically.
-
-**Next steps:**
-- Review fix plan in `.ai-coding/fixes/fix-plan-{test_case_id}.yaml`
-- Apply fixes manually
-
-## Safety Features
-
-- Automatic backup before fixing
-- Rollback if verification fails
-- Manual review for low confidence fixes
-
-## Error Handling
-
-**Error: Root cause analysis not found**
-- Run `/ai-coding:diff-analyzer {test_case_id}` first
-
-**Error: Cannot modify source file**
-- Check file permissions
-- Ensure file is not locked
+**低置信度（人工介入）：**
+- 架构级别问题
+- 需要业务确认的问题

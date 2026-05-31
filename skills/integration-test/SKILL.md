@@ -1,163 +1,93 @@
 ---
 name: integration-test
-description: "Execute integration tests with automatic service startup, API calls, data collection, and validation"
+description: "执行集成测试并验证中间件数据"
 ---
 
-# integration-test - Integration Test Executor
+# integration-test - 集成测试执行器
 
-Execute complete integration test workflow.
+执行完整的集成测试流程。
 
-## What This Does
+## 重要规则
 
-- Starts the service automatically
-- Executes test cases
-- Collects and validates data from middleware
-- Generates test reports
-- Stops the service
+**必须用中文与用户交流** - 所有输出、提示、摘要都必须使用中文。
 
-## Prerequisites
+## 功能说明
 
-- [ ] `.ai-coding/config.yaml` exists (run `/ai-coding:init` first)
-- [ ] Test cases exist (run `/ai-coding:testcase-generator` first)
-- [ ] Data collection plans exist (run `/ai-coding:assertion-generator` first)
-- [ ] Middleware services are running (MySQL, Redis, etc.)
+- 启动服务
+- 执行 API 调用
+- 采集中间件数据
+- 验证数据正确性
+- 生成测试结果
 
-## How To Execute
+## 前置条件
 
-**IMPORTANT:** You MUST execute the Python script using the Bash tool.
+- [ ] `.ai-coding/config.yaml` 已存在
+- [ ] 测试用例已生成
+- [ ] 数据采集计划已生成
+- [ ] 中间件已配置并运行
+
+## 执行步骤
+
+**重要：必须使用 Bash 工具执行 Python 脚本。**
 
 ```bash
-# Find plugin installation path
+# 查找插件安装路径
 PLUGIN_PATH=$(find ~/.claude/plugins/cache -path "*/ai-coding-marketplace/ai-coding/*" -name "skills" -type d | head -1 | xargs dirname)
 
-# If not found in cache, try local
 if [ -z "$PLUGIN_PATH" ]; then
     PLUGIN_PATH=$(find ~/.claude/plugins/local -name "ai-coding" -type d | head -1)
 fi
 
-# If still not found, report error
 if [ -z "$PLUGIN_PATH" ]; then
-    echo "❌ Error: ai-coding plugin not found"
+    echo "❌ 错误: 找不到 ai-coding 插件"
     exit 1
 fi
 
-# Execute the integration-test script
-# Optional: specify test case IDs (space-separated)
-python "$PLUGIN_PATH/skills/integration-test/run.py" "$@"
+# 执行集成测试
+python "$PLUGIN_PATH/skills/integration-test/run.py" "$1"
 ```
 
-## Arguments
+## 参数说明
 
-- `test_case_ids` (optional): Space-separated test case IDs
-  - If provided: executes only specified test cases
-  - If omitted: executes all test cases
+- `test_case_id`（可选）：指定要执行的测试用例 ID
 
-Examples:
-```bash
-# Execute all test cases
-python "$PLUGIN_PATH/skills/integration-test/run.py"
+## 输出结果
 
-# Execute specific test case
-python "$PLUGIN_PATH/skills/integration-test/run.py" TC001
+生成 `.ai-coding/results/actual-result-{test_case_id}.yaml`
 
-# Execute multiple test cases
-python "$PLUGIN_PATH/skills/integration-test/run.py" TC001 TC002 TC003
+## 执行完成后
+
+用中文向用户展示：
+
+```
+✅ 集成测试执行完成！
+
+📊 测试结果：
+- 通过: X 个
+- 失败: X 个
+- 总计: X 个
+
+📁 结果文件：
+.ai-coding/results/
+
+📝 后续步骤：
+1. 查看测试结果
+2. 如有失败，运行 /ai-coding:diff-analyzer 分析差异
+3. 运行 /ai-coding:report-generator 生成测试报告
+
+需要我帮你分析失败原因吗？
 ```
 
-## Workflow
+## 错误处理
 
-1. Load configuration and test cases
-2. Start service (if not already running)
-3. Health check
-4. Execute test cases:
-   - Call API
-   - Verify HTTP response
-   - Collect data from middleware
-   - Compare with expected results
-5. Generate test reports
-6. Stop service
+**错误：服务启动失败**
+- 检查服务启动命令是否正确
+- 检查端口是否被占用
 
-## Output
+**错误：中间件连接失败**
+- 检查中间件是否运行
+- 检查配置文件中的连接信息
 
-Generated files:
-- `.ai-coding/results/actual-result-{test_case_id}.yaml` - Actual data snapshot
-- `.ai-coding/results/diff-{test_case_id}.yaml` - Diff report
-- `.ai-coding/results/test-summary.json` - Test summary
-- `.ai-coding/reports/test-report.html` - HTML report
-- `.ai-coding/reports/test-report.md` - Markdown report
-- `.ai-coding/reports/test-report.json` - JSON report
-
-## After Execution
-
-**If all tests pass:**
-✅ All tests passed!
-
-**Next steps:**
-- Review test reports in `.ai-coding/reports/`
-- Run `/ai-coding:report-generator` for detailed analysis
-
-**If tests fail:**
-❌ Some tests failed.
-
-**Next steps:**
-- Review diff reports in `.ai-coding/results/diff-*.yaml`
-- Run `/ai-coding:diff-analyzer <test_case_id>` to analyze failures
-- Run `/ai-coding:auto-fixer <test_case_id>` to attempt automatic fixes
-
-## Configuration
-
-Edit `.ai-coding/config.yaml` to configure:
-
-```yaml
-service:
-  type: springboot
-  start_command: mvn spring-boot:run
-  health_check_url: http://localhost:8080/actuator/health
-  base_url: http://localhost:8080
-  startup_timeout: 60
-
-middleware:
-  mysql:
-    enabled: true
-    host: localhost
-    port: 3306
-    user: root
-    password: password
-    database: test_db
-
-test:
-  strategy: backend
-  target_pass_rate: 0.95
-```
-
-## Error Handling
-
-**Error: Service failed to start**
-- Check if port is already in use
-- Check service startup command in config
-- Check service logs
-
-**Error: Middleware connection failed**
-- Ensure middleware services are running
-- Check connection settings in config
-- Test connection manually
-
-**Error: Test case not found**
-- Check if test cases exist in `.ai-coding/testcases/`
-- Check if data collection plans exist in `.ai-coding/plans/`
-
-**Error: API call failed**
-- Check service health
-- Check API endpoint URL
-- Check request parameters
-
-## Advanced Usage
-
-**Execute specific test cases:**
-```bash
-python "$PLUGIN_PATH/skills/integration-test/run.py" TC001 TC002
-```
-
-**Skip service management (service already running):**
-- Edit the script or config to skip service start/stop
-- Useful for debugging or when service is managed externally
+**错误：API 调用失败**
+- 检查服务是否正常启动
+- 检查 API 路径是否正确

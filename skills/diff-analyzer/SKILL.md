@@ -1,96 +1,93 @@
 ---
 name: diff-analyzer
-description: "Analyze test failures using AI to identify root causes and categorize issues (Real Bug, Timing, Environment, Assertion)"
+description: "分析测试失败原因并分类问题"
 ---
 
-# diff-analyzer - Diff Analyzer
+# diff-analyzer - 差异分析器
 
-AI-powered test failure analysis to identify root causes.
+使用 AI 分析测试失败的根本原因。
 
-## What This Does
+## 重要规则
 
-When tests fail, AI automatically analyzes:
-- Reads diff reports
-- Analyzes code logic
-- Reviews log information
-- Identifies root causes
-- Categorizes diff types
-- Generates fix suggestions
+**必须用中文与用户交流** - 所有输出、提示、摘要都必须使用中文。
 
-## Prerequisites
+## 功能说明
 
-- [ ] Test has been executed (run `/ai-coding:integration-test` first)
-- [ ] Diff report exists in `.ai-coding/results/diff-{test_case_id}.yaml`
+- 对比预期结果和实际结果
+- 识别差异根本原因
+- 分类问题类型（真实 Bug、时序问题、环境问题、断言问题）
+- 生成修复建议
 
-## How To Execute
+## 前置条件
 
-**IMPORTANT:** You MUST execute the Python script using the Bash tool.
+- [ ] 集成测试已执行
+- [ ] 存在测试失败的用例
+
+## 执行步骤
+
+**重要：必须使用 Bash 工具执行 Python 脚本。**
 
 ```bash
-# Find plugin installation path
 PLUGIN_PATH=$(find ~/.claude/plugins/cache -path "*/ai-coding-marketplace/ai-coding/*" -name "skills" -type d | head -1 | xargs dirname)
 
-# If not found in cache, try local
 if [ -z "$PLUGIN_PATH" ]; then
     PLUGIN_PATH=$(find ~/.claude/plugins/local -name "ai-coding" -type d | head -1)
 fi
 
-# If still not found, report error
 if [ -z "$PLUGIN_PATH" ]; then
-    echo "❌ Error: ai-coding plugin not found"
-    exit 1
-fi
-
-# Execute the diff-analyzer script
-# Required: test_case_id
-if [ -z "$1" ]; then
-    echo "❌ Error: test_case_id is required"
-    echo "Usage: /ai-coding:diff-analyzer <test_case_id>"
+    echo "❌ 错误: 找不到 ai-coding 插件"
     exit 1
 fi
 
 python "$PLUGIN_PATH/skills/diff-analyzer/run.py" "$1"
 ```
 
-## Arguments
+## 参数说明
 
-- `test_case_id` (required): Test case ID to analyze
+- `test_case_id`（可选）：指定要分析的测试用例 ID
 
-Example:
-```bash
-python "$PLUGIN_PATH/skills/diff-analyzer/run.py" TC001
+## 输出结果
+
+生成 `.ai-coding/analysis/root-cause-analysis-{test_case_id}.yaml`
+
+## 执行完成后
+
+用中文向用户展示：
+
+```
+✅ 差异分析完成！
+
+📊 分析结果：
+- 真实 Bug: X 个
+- 时序问题: X 个
+- 环境问题: X 个
+- 断言问题: X 个
+
+📁 分析文件：
+.ai-coding/analysis/
+
+📝 后续步骤：
+1. 查看根因分析报告
+2. 对于真实 Bug，运行 /ai-coding:auto-fixer 自动修复
+3. 对于其他问题，根据建议手动调整
+
+需要我帮你自动修复 Bug 吗？
 ```
 
-## Diff Categories
+## 问题分类
 
-**1. Real Bug** - Actual code defects
-**2. Timing Problem** - Async operations, cache delays
-**3. Environment Problem** - Config issues, data state
-**4. Assertion Problem** - Incorrect validation rules
+**真实 Bug：**
+- 代码逻辑错误
+- 业务规则实现错误
 
-## Output
+**时序问题：**
+- 异步操作未完成
+- 消息队列延迟
 
-Generates `.ai-coding/analysis/root-cause-{test_case_id}.yaml` containing:
-- Category and confidence level
-- Root cause description
-- Code location
-- Evidence
-- Fix suggestions
+**环境问题：**
+- 中间件配置不一致
+- 测试数据污染
 
-## After Execution
-
-✅ Root cause analysis completed!
-
-**Next steps:**
-- Review the analysis in `.ai-coding/analysis/root-cause-{test_case_id}.yaml`
-- Run `/ai-coding:auto-fixer {test_case_id}` to attempt automatic fix
-
-## Error Handling
-
-**Error: Diff report not found**
-- Run `/ai-coding:integration-test {test_case_id}` first
-- Check if test actually failed
-
-**Error: Cannot access source code**
-- Ensure project source code is accessible
-- Check file permissions
+**断言问题：**
+- 预期值设置错误
+- 验证规则不合理

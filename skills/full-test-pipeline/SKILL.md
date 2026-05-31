@@ -1,146 +1,122 @@
 ---
 name: full-test-pipeline
-description: "Execute complete test pipeline from test case generation to reporting with optional auto-fix"
+description: "执行完整的测试流程（从生成测试用例到报告）"
 ---
 
-# full-test-pipeline - Full Test Pipeline
+# full-test-pipeline - 完整测试流程
 
-One-command execution of the complete test workflow.
+执行完整的测试流程，包含所有步骤。
 
-## What This Does
+## 重要规则
 
-Automates the entire test pipeline:
-- Generates test cases (optional)
-- Generates data collection plans
-- Starts test environment
-- Executes tests
-- Analyzes failures
-- Auto-fixes issues (optional)
-- Generates reports
+**必须用中文与用户交流** - 所有输出、提示、摘要都必须使用中文。
 
-## Prerequisites
+## 功能说明
 
-- [ ] `.ai-coding/config.yaml` exists (run `/ai-coding:init` first)
-- [ ] Middleware services are running (MySQL, Redis, etc.)
+自动执行完整的测试流程：
+1. 生成测试用例
+2. 生成数据采集计划
+3. 执行集成测试
+4. 分析失败原因
+5. 自动修复（可选）
+6. 生成测试报告
 
-## How To Execute
+## 前置条件
 
-**IMPORTANT:** You MUST execute the Python script using the Bash tool.
+- [ ] `.ai-coding/config.yaml` 已存在
+- [ ] 规范文档已准备
+- [ ] 中间件已配置并运行
+
+## 执行步骤
+
+**重要：必须使用 Bash 工具执行 Python 脚本。**
 
 ```bash
-# Find plugin installation path
 PLUGIN_PATH=$(find ~/.claude/plugins/cache -path "*/ai-coding-marketplace/ai-coding/*" -name "skills" -type d | head -1 | xargs dirname)
 
-# If not found in cache, try local
 if [ -z "$PLUGIN_PATH" ]; then
     PLUGIN_PATH=$(find ~/.claude/plugins/local -name "ai-coding" -type d | head -1)
 fi
 
-# If still not found, report error
 if [ -z "$PLUGIN_PATH" ]; then
-    echo "❌ Error: ai-coding plugin not found"
+    echo "❌ 错误: 找不到 ai-coding 插件"
     exit 1
 fi
 
-# Execute the full-test-pipeline script
 python "$PLUGIN_PATH/skills/full-test-pipeline/run.py"
 ```
 
-## Arguments
+## 参数说明
 
-No arguments required. The script executes all test cases in the pipeline.
+无需参数，自动执行所有步骤。
 
-## Execution Modes
-
-**Quick Mode (default):**
-- Generate plans → Execute tests → Generate reports
-- Fast, suitable for CI/CD
-
-**Standard Mode:**
-- Generate plans → Execute tests → Analyze failures → Generate reports
-- Includes AI analysis
-
-**Full Mode:**
-- Generate plans → Execute tests → Analyze failures → Auto-fix → Re-test → Generate reports
-- Complete automation with fixes
-
-## Workflow
+## 执行流程
 
 ```
-1. Load test cases
+1. 生成测试用例
    ↓
-2. Generate data collection plans (AI)
+2. 生成数据采集计划
    ↓
-3. Start service
+3. 执行集成测试
    ↓
-4. Execute tests
+4. 分析失败原因（如有失败）
    ↓
-5. Analyze failures (AI)
+5. 自动修复（可选）
    ↓
-6. Auto-fix (optional, AI)
-   ↓
-7. Re-test (if fixed)
-   ↓
-8. Generate reports
-   ↓
-9. Stop service
+6. 生成测试报告
 ```
 
-## Output
+## 执行完成后
 
-Complete test artifacts:
-- Test cases: `.ai-coding/testcases/`
-- Collection plans: `.ai-coding/plans/`
-- Test results: `.ai-coding/results/`
-- Analysis: `.ai-coding/analysis/`
-- Fixes: `.ai-coding/fixes/`
-- Reports: `.ai-coding/reports/`
+用中文向用户展示：
 
-## After Execution
+```
+✅ 完整测试流程执行完成！
 
-**If all tests pass:**
-✅ All tests passed! Pipeline completed successfully.
+📊 总体统计：
+- 测试用例: X 个
+- 通过: X 个
+- 失败: X 个
+- 自动修复: X 个
+- 通过率: X%
 
-**If tests fail (without auto-fix):**
-⚠️ Some tests failed. Review analysis reports.
+📁 生成文件：
+- 测试用例: .ai-coding/testcases/
+- 采集计划: .ai-coding/plans/
+- 测试结果: .ai-coding/results/
+- 失败分析: .ai-coding/analysis/
+- 修复记录: .ai-coding/fixes/
+- 测试报告: .ai-coding/reports/
 
-**Next steps:**
-- Review failure analysis in `.ai-coding/analysis/`
-- Run `/ai-coding:auto-fixer {test_case_id}` to fix issues
-- Or re-run with auto-fix enabled
+📝 后续步骤：
+1. 查看 HTML 测试报告
+2. 检查失败用例的根因分析
+3. 提交代码变更
 
-**If tests fail (with auto-fix):**
-🔧 Fixes applied. Re-testing...
+需要我帮你打开测试报告吗？
+```
 
-**Result:**
-- ✅ All tests passed after fixes
-- Or ❌ Some tests still failing (manual intervention needed)
+## 配置选项
 
-## Configuration
-
-Edit `.ai-coding/config.yaml` to configure:
+编辑 `.ai-coding/config.yaml` 配置流程：
 
 ```yaml
-full_test_pipeline:
-  default_mode: standard
-  auto_fix: false
-  auto_fix_threshold: 0.9
-  stop_on_failure: false
-  generate_html_report: true
+pipeline:
+  auto_fix: true          # 是否自动修复
+  stop_on_failure: false  # 失败时是否停止
+  parallel: false         # 是否并行执行
 ```
 
-## Error Handling
+## 错误处理
 
-**Error: Service failed to start**
-- Check service configuration
-- Check if port is available
-- Review service logs
+**错误：某个步骤失败**
+- 查看日志了解失败原因
+- 可以单独运行失败的步骤
 
-**Error: Middleware connection failed**
-- Ensure middleware services are running
-- Check connection settings in config
+**错误：服务启动失败**
+- 检查服务配置
+- 确保端口未被占用
 
-**Error: Test execution failed**
-- Review test logs in `.ai-coding/logs/`
-- Check API endpoints
-- Verify test data
+**错误：中间件连接失败**
+- 检查中间件是否运行
+- 验证连接配置
