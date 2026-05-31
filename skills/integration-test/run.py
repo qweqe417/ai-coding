@@ -105,6 +105,9 @@ def main(test_case_ids=None, skip_service_start=False):
         if config_mgr.get(f"middleware.{middleware}.enabled", False):
             middleware_configs[middleware] = config_mgr.get(f"middleware.{middleware}")
 
+    # 4.5. 读取认证配置
+    auth_config = config_mgr.get("service.auth", {})
+
     # 5. 执行测试
     print()
     print("[4/6] 执行测试...")
@@ -115,7 +118,8 @@ def main(test_case_ids=None, skip_service_start=False):
             service_adapter,
             middleware_configs,
             config_mgr.get("service.base_url"),
-            logger
+            logger,
+            auth_config
         )
     else:
         # 创建一个不启动服务的执行器
@@ -139,7 +143,8 @@ def main(test_case_ids=None, skip_service_start=False):
             None,
             middleware_configs,
             config_mgr.get("service.base_url"),
-            logger
+            logger,
+            auth_config
         )
 
     plans_dir = config_mgr.get_directory("plans")

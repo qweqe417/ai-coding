@@ -38,6 +38,25 @@ service:
   base_url: http://localhost:8080
   startup_timeout: 60
 
+  # 认证配置
+  auth:
+    enabled: true
+    type: token  # token | basic | oauth2
+    token: your-api-token-here  # API Token
+    header_name: Authorization  # Token 放在哪个 Header
+    header_prefix: Bearer  # Token 前缀，如 "Bearer xxx"
+
+    # 如果使用 Basic Auth
+    # type: basic
+    # username: admin
+    # password: password123
+
+    # 如果使用 OAuth2
+    # type: oauth2
+    # token_url: http://localhost:8080/oauth/token
+    # client_id: your-client-id
+    # client_secret: your-client-secret
+
 config_source:
   type: auto
   detected: local

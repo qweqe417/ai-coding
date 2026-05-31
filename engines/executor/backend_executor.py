@@ -23,7 +23,8 @@ class BackendTestExecutor:
         service_adapter: ServiceAdapter,
         middleware_configs: Dict[str, Dict[str, Any]],
         base_url: str,
-        logger: Optional[logging.Logger] = None
+        logger: Optional[logging.Logger] = None,
+        auth_config: Optional[Dict[str, Any]] = None
     ):
         """
         初始化后端测试执行器
@@ -33,11 +34,13 @@ class BackendTestExecutor:
             middleware_configs: 中间件配置
             base_url: 服务基础URL
             logger: 日志实例
+            auth_config: 认证配置
         """
         self.service_adapter = service_adapter
         self.middleware_configs = middleware_configs
         self.base_url = base_url
         self.logger = logger or logging.getLogger(__name__)
+        self.auth_config = auth_config or {}
         self.assertion_engine = AssertionEngine(middleware_configs, logger)
 
     def run(
@@ -180,8 +183,38 @@ class BackendTestExecutor:
         method = testcase.api.method.upper()
 
         kwargs = {}
-        if testcase.api.headers:
-            kwargs['headers'] = testcase.api.headers
+
+        # 设置请求头
+        headers = testcase.api.headers.copy() if testcase.api.headers else {}
+
+        # 添加认证信息
+        if self.auth_config.get('enabled', False):
+            auth_type = self.auth_config.get('type', 'token')
+
+            if auth_type == 'token':
+                # Token 认证
+                token = self.auth_config.get('token')
+                header_name = self.auth_config.get('header_name', 'Authorization')
+                header_prefix = self.auth_config.get('header_prefix', 'Bearer')
+
+                if token:
+                    if header_prefix:
+                        headers[header_name] = f"{header_prefix} {token}"
+                    else:
+                        headers[header_name] = token
+                    self.logger.debug(f"Added token to header: {header_name}")
+
+            elif auth_type == 'basic':
+                # Basic Auth
+                username = self.auth_config.get('username')
+                password = self.auth_config.get('password')
+                if username and password:
+                    from requests.auth import HTTPBasicAuth
+                    kwargs['auth'] = HTTPBasicAuth(username, password)
+                    self.logger.debug("Added Basic Auth")
+
+        if headers:
+            kwargs['headers'] = headers
         if testcase.api.body:
             kwargs['json'] = testcase.api.body
         if testcase.api.params:
