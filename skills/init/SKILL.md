@@ -7,16 +7,25 @@ description: "初始化 AI Coding 集成测试框架"
 
 为当前项目初始化 AI Coding 集成测试框架。
 
-## 功能说明
+## 重要规则
 
-- 自动检测项目类型（Java/Python/Go/Node.js/Vue/React）
-- 生成 `.ai-coding/config.yaml` 配置文件
-- 创建必要的目录结构
-- 提供配置建议
+1. **必须用中文与用户交流** - 所有输出、提示、摘要都必须使用中文
+2. **必须检查文件是否存在** - 不要凭记忆判断，要实际检查 `.ai-coding/config.yaml` 是否存在
+3. **必须实际执行** - 不要只描述步骤，要真正执行命令创建文件
 
 ## 执行步骤
 
-**重要：你必须按顺序执行以下所有步骤，不能跳过！**
+### 0. 检查是否已初始化
+
+**首先使用 Bash 工具检查配置文件是否存在：**
+
+```bash
+ls -la .ai-coding/config.yaml 2>/dev/null || echo "配置文件不存在"
+```
+
+- 如果文件存在，用中文询问用户："检测到 .ai-coding/config.yaml 已存在，是否要重新初始化？（会覆盖现有配置）"
+- 如果用户回答"否"或"不"，则停止执行
+- 如果文件不存在，或用户同意覆盖，继续执行下面的步骤
 
 ### 1. 检测项目类型
 
@@ -52,63 +61,65 @@ ls -la .ai-coding/
 **使用 Write 工具创建 `.ai-coding/config.yaml` 文件**，内容如下（替换 `<>` 中的占位符为实际检测到的值）：
 
 ```yaml
+# AI Coding 集成测试框架配置文件
+
 project:
-  name: "<从 pom.xml 或 package.json 中读取的项目名>"
-  type: "microservice"
-  language: "<检测到的语言: java/python/go/javascript>"
-  framework: "<检测到的框架: spring-boot/vue/react/express>"
+  name: "<从 pom.xml 或 package.json 中读取的项目名>"  # 项目名称
+  type: "microservice"  # 项目类型：microservice(微服务) / web(网站) / api(API服务)
+  language: "<检测到的语言: java/python/go/javascript>"  # 编程语言
+  framework: "<检测到的框架: spring-boot/vue/react/express>"  # 开发框架
 
 service:
-  base_url: "http://localhost:8080"
-  start_command: "<根据项目类型填写启动命令>"
-  health_check: "/actuator/health"
-  startup_timeout: 30
+  base_url: "http://localhost:8080"  # 服务访问地址
+  start_command: "<根据项目类型填写启动命令>"  # 服务启动命令，如：mvn spring-boot:run
+  health_check: "/actuator/health"  # 健康检查接口路径
+  startup_timeout: 30  # 服务启动超时时间（秒）
 
 middleware:
   mysql:
-    enabled: false
-    host: "localhost"
-    port: 3306
-    user: "root"
-    password: ""
-    database: "test_db"
+    enabled: false  # 是否启用 MySQL 数据验证
+    host: "localhost"  # MySQL 服务器地址
+    port: 3306  # MySQL 端口
+    user: "root"  # 数据库用户名
+    password: ""  # 数据库密码
+    database: "test_db"  # 数据库名称
   
   redis:
-    enabled: false
-    host: "localhost"
-    port: 6379
-    db: 0
+    enabled: false  # 是否启用 Redis 缓存验证
+    host: "localhost"  # Redis 服务器地址
+    port: 6379  # Redis 端口
+    db: 0  # Redis 数据库编号
   
   mongodb:
-    enabled: false
-    host: "localhost"
-    port: 27017
-    database: "test_db"
+    enabled: false  # 是否启用 MongoDB 验证
+    host: "localhost"  # MongoDB 服务器地址
+    port: 27017  # MongoDB 端口
+    database: "test_db"  # MongoDB 数据库名称
   
   rabbitmq:
-    enabled: false
-    host: "localhost"
-    port: 5672
-    username: "guest"
-    password: "guest"
+    enabled: false  # 是否启用 RabbitMQ 消息队列验证
+    host: "localhost"  # RabbitMQ 服务器地址
+    port: 5672  # RabbitMQ 端口
+    username: "guest"  # RabbitMQ 用户名
+    password: "guest"  # RabbitMQ 密码
   
   kafka:
-    enabled: false
-    bootstrap_servers: "localhost:9092"
-    topics: []
+    enabled: false  # 是否启用 Kafka 消息队列验证
+    bootstrap_servers: "localhost:9092"  # Kafka 服务器地址
+    topics: []  # 需要监听的 Kafka 主题列表
   
   elasticsearch:
-    enabled: false
-    hosts: ["http://localhost:9200"]
+    enabled: false  # 是否启用 Elasticsearch 搜索引擎验证
+    hosts: ["http://localhost:9200"]  # Elasticsearch 服务器地址列表
 
 test:
-  timeout: 30
-  retry: 3
-  parallel: false
+  timeout: 30  # 单个测试用例超时时间（秒）
+  retry: 3  # 测试失败后重试次数
+  parallel: false  # 是否并行执行测试用例
 
 logging:
-  level: "INFO"
-  output: "console"
+  level: "INFO"  # 日志级别：DEBUG / INFO / WARNING / ERROR
+  output: "console"  # 日志输出方式：console(控制台) / file(文件)
 ```
 
 **验证文件创建成功：**
@@ -119,7 +130,7 @@ cat .ai-coding/config.yaml
 
 ### 4. 显示中文摘要
 
-用中文向用户展示初始化结果：
+**必须用中文**向用户展示初始化结果：
 
 ```
 ✅ AI Coding 框架初始化成功！
@@ -170,14 +181,11 @@ cat .ai-coding/config.yaml
 需要我帮你配置中间件连接吗？
 ```
 
-## Output
+## 注意事项
 
-The script will:
-1. Detect project type and language
-2. Create `.ai-coding/` directory structure:
-   - `specs/` - Specification documents
-   - `testcases/` - Test case definitions
-   - `plans/` - Data collection plans
+- 如果配置文件已存在，会提示用户是否覆盖
+- 所有与用户的交互必须使用中文
+- 必须实际执行命令，不要只描述步骤
    - `results/` - Test execution results
    - `reports/` - Generated reports
    - `logs/` - Execution logs
